@@ -135,3 +135,13 @@ Go has an aptly named [`os`](https://golang.org/pkg/os/) package too!
 
 Go's [`regexp`](https://golang.org/pkg/regexp/) is equivalent.
 
+## `sys`
+
+The Python implementation uses this to access unnamed command line arguments. We
+can [reuse the `Flag` package in Go](https://golang.org/pkg/flag/#Args) for the
+same purpose.
+
+## `zlib`
+
+Go's [`zlib`](https://golang.org/pkg/compress/zlib/) package in the standard
+library is equivalent.
