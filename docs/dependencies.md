@@ -42,6 +42,56 @@ go run main.go
 go run main.go add -stringArg=hello
 ```
 
+Subcommands can be managed via the
+[`FlagSet`](https://golang.org/pkg/flag/#FlagSet) type. API documentation is a
+bit sparse for this one, but this [blog
+post](https://blog.rapid7.com/2016/08/04/build-a-simple-cli-tool-with-golang/)
+covers it quite well. `FlagSet` exposes the same methods as `Flag`, but you can
+declare many of them in your program and choose which one to use based on the
+command. If we consider:
+
+  go main.go add myfile.txt
+  go main.go status
+  
+we can use [`os.Args`](https://golang.org/pkg/os/#pkg-variables) to retrieve the
+subcommand (`os.Args[1]`), and then switch on its value to determine the correct
+`FlagSet` to use. We then call `<FlagSet>.Parse(os.Args[2:])` to parse the
+remainder of the arguments. Example:
+
+```go
+package main
+
+import (
+	"flag"
+	"log"
+	"os"
+)
+
+func main() {
+	addCommand := flag.NewFlagSet("add", flag.ExitOnError)
+	statusCommand := flag.NewFlagSet("status", flag.ExitOnError)
+
+	// foo := addCommand.String(...)
+	// bar := statusCommand.Int(...)
+
+	if len(os.Args) < 2 {
+		log.Fatal("subcommand is required")
+	}
+
+	switch os.Args[1] {
+	case "add":
+		// do addCommand stuff
+		addCommand.Parse(os.Args[2:])
+	case "status":
+		// do statusCommand stuff
+		statusCommand.Parse(os.Args[2:])
+	default:
+		log.Fatal("invalid subcommand provided")
+	}
+}
+```
+
+
 ## `collections/OrderedDict`
 
 Unfortunately Go doesn't include an ordered map type in its standard library.
@@ -138,8 +188,8 @@ Go's [`regexp`](https://golang.org/pkg/regexp/) is equivalent.
 ## `sys`
 
 The Python implementation uses this to access unnamed command line arguments. We
-can [reuse the `Flag` package in Go](https://golang.org/pkg/flag/#Args) for the
-same purpose.
+can use [`os.Args`](https://golang.org/pkg/os/#pkg-variables) in the `os`
+package to parse arguments like the subcommand (i.e. `add`, `status`, `init`)
 
 ## `zlib`
 
