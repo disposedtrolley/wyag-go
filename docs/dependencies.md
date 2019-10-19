@@ -100,7 +100,7 @@ saving changes back to disk.
 
 ## `hashlib`
 
-The `crypto` package in the standard library supports SHA1.
+The `crypto` package in the standard library supports [SHA1](https://golang.org/pkg/crypto/sha1/)
 
 ```go
 package main
@@ -126,3 +126,12 @@ contents of my committed file
 	fmt.Printf("%x", h.Sum(nil))
 }
 ```
+
+## `os`
+
+Go has an aptly named [`os`](https://golang.org/pkg/os/) package too!
+
+## `re`
+
+Go's [`regexp`](https://golang.org/pkg/regexp/) is equivalent.
+
