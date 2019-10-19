@@ -41,3 +41,9 @@ go run main.go
 // aString: hello  others: [add]
 go run main.go add -stringArg=hello
 ```
+
+## `collections/OrderedDict`
+
+Unfortunately Go doesn't include an ordered map type in its standard library.
+[iancoleman/orderedmap](https://github.com/iancoleman/orderedmap) appears to be
+a suitable candidate; explicitly stating it's equivalence to `OrderedDict`.
