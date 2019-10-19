@@ -97,3 +97,32 @@ func main() {
 `ini` has support for validation in both value and type. Both support defining a
 default value if none were supplied. Keys can be retrieved as well as set,
 saving changes back to disk.
+
+## `hashlib`
+
+The `crypto` package in the standard library supports SHA1.
+
+```go
+package main
+
+import (
+	"bytes"
+	"crypto/sha1"
+	"fmt"
+	"io"
+	"log"
+)
+
+func main() {
+	contents := []byte(`
+contents of my committed file
+`)
+	r := bytes.NewReader(contents)
+	h := sha1.New()
+	if _, err := io.Copy(h, r); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%x", h.Sum(nil))
+}
+```
