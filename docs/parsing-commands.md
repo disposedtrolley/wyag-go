@@ -6,57 +6,54 @@ single optional positional argument, defaulting to the current directory (`.`),
 while `tag` accepts zero, one, or two arguments.
 
 One of the outstanding design decisions is how we want to delegate the task of
-parsing arguments for these commands. We can design all of the entrypoint
-functions to share a uniform interface, i.e.:
+parsing arguments for these commands. The design should allow for commands to be
+easily added in the future, with minimal change to the existing parsing logic.
+
+We can structure all of the entrypoint functions to share a uniform interface,
+i.e.:
+
+```go
+func Init(args []string) error {
+    // parse args and init repo
+}
+
+func main() {
+   switch os.Args[1] {
+       case "init":
+           err := Init(os.Args[2:])
+       ...
+   } 
+}
+``` 
+
+Responsibility of parsing the subset of arguments related to the function is
+delegated to the function itself. This means when we want to add a command in
+the future, the only bit of existing code which needs to be altered is the
+`switch` statement.
+
+I played around with the idea of implementing an common `interface` across
+commands, but it resulted in overengineered code:
 
 ```go
 type Command interface {
     Execute(args []string) error
 }
 
-type InitCommand struct {
-    dir string
+type Init struct {}
+
+func (c *Init) Execute(args []string) error {
+    // parse args and init repo
 }
 
-func (c *InitCommand) Execute(args []string) error {
-    // parse args
-}
-``` 
-
-or create types to encapsulate each command's unique set of arguments, like so:
-
-```go
-type InitCommandArgs struct {
-    Dir string
-}
-
-func Init(args InitCommandArgs) {
-    // initialise repo at args.Dir
-}
-```
-
-or combine the command's arguments and execution logic in a single struct, where
-arguments are provided via a constructor function:
-
-```go
-type Command interface {
-    func Execute() error
-}
-
-type InitCommand struct {
-    Dir string
-}
-
-func (c *InitCommand) Execute() error {
-    // initialise repo at c.Dir
-}
-
-func NewInitCommand(dir string) *InitCommand {
-    return &InitCommand{
-        Dir: dir,
+func main() {
+    switch os.Args[1] {
+        case "init":
+            command := &Init{}
+            err := command.Execute(os.Args[2:])
     }
 }
 ```
 
-I think I prefer the last approach, since we can still define a common interface
-for the execution of each command
+Most importantly, the idea of an `interface` doesn't help here, as commands are
+mutually exclusive and more than one command cannot be run in the same
+invocation of the program.
